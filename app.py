@@ -1,3 +1,7 @@
+# Autor: Cristóbal Cabrera
+# Proyecto: Eficiencia Energética App
+# Fecha: Enero 2025
+
 from flask import Flask, render_template, request, redirect, url_for
 import sqlite3
 from datetime import datetime
@@ -95,20 +99,49 @@ def update_calculations():
 
 @app.route('/view_data', methods=['GET'])
 def view_data():
-    with sqlite3.connect(DB_PATH, timeout=10) as conn:
-        cursor = conn.cursor()
-        # Recuperar todos los registros, ordenados desde el último
-        cursor.execute('''
-            SELECT rowid, CLIENTE, "Fecha inicio periodo", "Fecha fin periodo", 
-                   "Agua (m3)", "Gas (m3)", "Período (días)", "Eficiencia energética",
-                   "Emisión Co2 (Kg)", "Valor m3 ACS", "Equivalencia arboles"
-            FROM Clientes
-            ORDER BY rowid DESC
-        ''')
-        registros = cursor.fetchall()
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
 
-    # Renderizar una nueva plantilla con los registros
-    return render_template('view_data.html', registros=registros)
+    # Consulta para obtener registros
+    cursor.execute('''
+        SELECT rowid, CLIENTE, "Fecha inicio periodo", "Fecha fin periodo",
+               "Agua (m3)", "Gas (m3)", "Período (días)", 
+               "Eficiencia energética", "Emisión Co2 (Kg)", 
+               "Valor m3 ACS", "Equivalencia arboles"
+        FROM Clientes
+        ORDER BY rowid DESC
+    ''')
+    registros = cursor.fetchall()
+    conn.close()
+
+    # Función para manejar conversiones a float
+    def safe_float(value):
+        if isinstance(value, str):
+            value = value.replace(',', '.')  # Reemplazar comas por puntos
+        try:
+            return float(value) if value else 0
+        except ValueError:
+            return 0
+
+    # Procesar registros para garantizar tipos seguros
+    registros_limpios = [
+        [
+            registro[0],  # rowid
+            registro[1],  # Cliente
+            registro[2],  # Fecha inicio
+            registro[3],  # Fecha fin
+            safe_float(registro[4]),  # Agua (m³)
+            safe_float(registro[5]),  # Gas (m³)
+            int(registro[6]) if registro[6] else 0,  # Período (días)
+            safe_float(registro[7]),  # Eficiencia energética
+            safe_float(registro[8]),  # Emisión CO₂
+            safe_float(registro[9]),  # Valor ACS
+            safe_float(registro[10])  # Equivalencia árboles
+        ]
+        for registro in registros
+    ]
+
+    return render_template('view_data.html', registros=registros_limpios)
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -14,44 +14,40 @@ def calculate_and_update():
         for registro in registros:
             rowid, agua, gas, periodo_dias = registro
 
-            # Manejar valores con coma como separador decimal
+            # Manejar valores nulos y cadenas con comas
             if isinstance(agua, str):
                 agua = agua.replace(',', '.')
             if isinstance(gas, str):
                 gas = gas.replace(',', '.')
 
-            # Convertir agua y gas a float, y manejar valores nulos
             agua = float(agua) if agua else 0
             gas = float(gas) if gas else 0
+            periodo_dias = int(periodo_dias) if periodo_dias else 0
 
-            # Calcular m³ agua/periodo y m³ gas/periodo
-            agua_por_periodo = agua / periodo_dias if agua and periodo_dias else None
-            gas_por_periodo = gas / periodo_dias if gas and periodo_dias else None
+            # Calcular métricas principales
+            agua_por_periodo = agua / periodo_dias if periodo_dias > 0 else 0
+            gas_por_periodo = gas / periodo_dias if periodo_dias > 0 else 0
+            agua_por_dia = agua / periodo_dias if periodo_dias > 0 else 0
+            gas_por_dia = gas / periodo_dias if periodo_dias > 0 else 0
+            agua_por_mes = agua_por_dia * 30 if agua_por_dia > 0 else 0
+            gas_por_mes = gas_por_dia * 30 if gas_por_dia > 0 else 0
 
-            # Calcular m³ agua/día y m³ gas/día
-            agua_por_dia = agua / periodo_dias if agua and periodo_dias else None
-            gas_por_dia = gas / periodo_dias if gas and periodo_dias else None
-
-            # Calcular m³ agua/mes y m³ gas/mes (30 días promedio)
-            agua_por_mes = agua_por_dia * 30 if agua_por_dia else None
-            gas_por_mes = gas_por_dia * 30 if gas_por_dia else None
-
-            # Calcular Eficiencia Energética
+            # Eficiencia Energética
             if gas > 0:
                 energia_agua = agua * 997 * 4186 * 40  # J
                 energia_gas = gas * 38128000  # J
                 eficiencia = (energia_agua / energia_gas) * 100
             else:
-                eficiencia = None
+                eficiencia = 0
 
-            # Calcular Emisiones de CO₂
-            emisiones_co2 = gas * 2.75 if gas else None
+            # Emisiones de CO₂ (usando fórmula gas/mes / 20)
+            emisiones_co2 = gas_por_mes / 20 if gas_por_mes > 0 else 0
 
-            # Calcular Valor m³ ACS (ejemplo: tarifa fija de 6.69 por m³)
-            valor_acs = agua * 6.69 if agua else None
+            # Valor ACS
+            valor_acs = agua * 6.69 if agua > 0 else 0
 
-            # Calcular Equivalencia en Árboles
-            equivalencia_arboles = emisiones_co2 / 21 if emisiones_co2 else None
+            # Equivalencia en Árboles
+            equivalencia_arboles = emisiones_co2 / 21 if emisiones_co2 > 0 else 0
 
             # Actualizar los cálculos en la base de datos
             cursor.execute('''

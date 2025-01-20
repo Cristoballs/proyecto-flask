@@ -28,13 +28,13 @@
                 <td>{{ registro[1] }}</td>
                 <td>{{ registro[2] }}</td>
                 <td>{{ registro[3] }}</td>
-                <td>{{ "%.2f" | format(registro[4]) }}</td>
-                <td>{{ "%.2f" | format(registro[5]) }}</td>
-                <td>{{ registro[6] }}</td>
-                <td>{{ "%.2f" | format(registro[7]) }}%</td>
-                <td>{{ "%.2f" | format(registro[8]) }}</td>
-                <td>${{ "%.2f" | format(registro[9]) }}</td>
-                <td>{{ "%.2f" | format(registro[10]) }}</td>
+                <td>{{ "%.2f" | format(registro[4]) if registro[4] is not none else "N/A" }}</td>
+                <td>{{ "%.2f" | format(registro[5]) if registro[5] is not none else "N/A" }}</td>
+                <td>{{ registro[6] if registro[6] is not none else "N/A" }}</td>
+                <td>{{ "%.2f" | format(registro[7]) + "%" if registro[7] is not none else "N/A" }}</td>
+                <td>{{ "%.2f" | format(registro[8]) if registro[8] is not none else "N/A" }}</td>
+                <td>${{ "%.2f" | format(registro[9]) if registro[9] is not none else "N/A" }}</td>
+                <td>{{ "%.2f" | format(registro[10]) if registro[10] is not none else "N/A" }}</td>
             </tr>
             {% endfor %}
         </tbody>

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Registro Exitoso{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="alert alert-success text-center">
+        <h1>¡Registro Exitoso!</h1>
+        <p>Los datos de la lectura han sido registrados correctamente.</p>
+        <p>{{ message if message else "" }}</p>
+    </div>
+    <div class="text-center">
+        <a href="/" class="btn btn-primary">Registrar otra lectura</a>
+        <a href="/update_calculations" class="btn btn-secondary">Actualizar Cálculos</a>
+    </div>
+</div>
+{% endblock %}

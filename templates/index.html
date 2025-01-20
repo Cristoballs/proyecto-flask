@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center">Registrar Lectura</h1>
+    <form method="post" action="/">
+        <div class="mb-3">
+            <label for="cliente" class="form-label">Seleccione Cliente</label>
+            <select class="form-select" id="cliente" name="cliente" required>
+                <option value="" selected disabled>Seleccione un cliente</option>
+                {% for cliente in clientes %}
+                <option value="{{ cliente }}">{{ cliente }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="fecha_inicio" class="form-label">Fecha Inicio (automática)</label>
+            <input type="text" class="form-control" id="fecha_inicio" name="fecha_inicio" readonly>
+        </div>
+        <div class="mb-3">
+            <label for="fecha_fin" class="form-label">Fecha Fin</label>
+            <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required>
+        </div>
+        <div class="mb-3">
+            <label for="agua" class="form-label">Consumo de Agua (m3)</label>
+            <input type="number" step="0.01" class="form-control" id="agua" name="agua" required>
+            <small id="last_agua" class="form-text text-muted"></small>
+        </div>
+        <div class="mb-3">
+            <label for="gas" class="form-label">Consumo de Gas (m3)</label>
+            <input type="number" step="0.01" class="form-control" id="gas" name="gas" required>
+            <small id="last_gas" class="form-text text-muted"></small>
+        </div>
+        <button type="submit" class="btn btn-primary">Registrar</button>
+    </form>
+    <div class="text-center mt-4">
+        <a href="/update_calculations" class="btn btn-secondary">Actualizar Cálculos</a>
+    </div>
+</div>
+
+<script>
+    document.getElementById('cliente').addEventListener('change', function() {
+        const cliente = this.value;
+        if (cliente) {
+            fetch(`/get_client_data/${cliente}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        document.getElementById('fecha_inicio').value = data.fecha_inicio;
+                        document.getElementById('last_agua').textContent = `Último consumo de agua: ${data.last_agua} m3`;
+                        document.getElementById('last_gas').textContent = `Último consumo de gas: ${data.last_gas} m3`;
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    });
+</script>
+{% endblock %}

@@ -143,5 +143,14 @@ def view_data():
 
     return render_template('view_data.html', registros=registros_limpios)
 
+# Ruta para eliminar una fila
+@app.route('/delete/<int:rowid>', methods=['POST'])
+def delete_row(rowid):
+    with sqlite3.connect(DB_PATH) as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM Clientes WHERE rowid = ?", (rowid,))
+        conn.commit()
+    return redirect(url_for('view_data'))
+
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,7 +1,7 @@
 import sqlite3
 
 # Ruta a la base de datos
-db_path = 'C:/Users/totol/venv/proyecto-flask/database/eficiencia.db'
+db_path = 'C:/proyecto-flask/database/eficiencia.db'
 
 def calculate_and_update():
     with sqlite3.connect(db_path, timeout=10) as conn:
